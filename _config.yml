@@ -69,4 +69,4 @@ theme: again
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/mayanktg/mayanktg.github.io
+  repo: git@github.com:mayanktg/mayanktg.github.io.git
