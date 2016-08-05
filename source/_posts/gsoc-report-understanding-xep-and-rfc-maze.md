@@ -1,0 +1,15 @@
+---
+title: GSoC Report - Understanding the XEPs and RFCs Maze
+date: 2014-06-8 17:16:18
+foreword: To send a message from one client to the other we need a signaling channel which provides a path for data transfer over the network. While working with WebRTC PeerConnection API for a web app no one worries about the channel since the SDP (Session Description Protocol) “offer” and “answer” is sent over a plaintext channel.
+---
+To send a message from one client to the other we need a signaling channel which provides a path for data transfer over the network. While working with WebRTC PeerConnection API for a web app no one worries about the channel since the SDP (Session Description Protocol) “offer” and “answer” is sent over a plaintext channel. But to implement RTCPeerConnection API for an XMPP account we need to send the message in the form of XML stanza through the Jingle channel. So the caller has to first convert the SDP offer into an XML stanza, send it over Jingle, callee receives the stanza, converts it back to original SDP offer and then repeat the same for his answer to the request.
+
+Here is how we broke this up and made it the Jingle way.
+
+1.  The first step was to get the plaintext [SDP offer](http://tools.ietf.org/html/rfc4566.html#section-1) and understand what each line and of it means, then create a suitable XML IQ Stanza for the same. We then finalized on using the [XEP-0320: Use of DTLS-SRTP in Jingle Sessions](http://xmpp.org/extensions/xep-0320.html) for creating the appropriate Stanza. We are also dependent on XEPs [0167](http://xmpp.org/extensions/xep-0167.html), [0293](http://xmpp.org/extensions/xep-0293.html#sdp-mapping) and [0294](http://xmpp.org/extensions/xep-0294.html#sdp-mapping). It needs a separate blogpost to explain about how the mapping was done as the information though available is sparse. I’ll write one in the next post.
+2.  Then we added a /call command for XMPP account which sends an IQ stanza to the receiver. We had an XML Stanza prototype we need to generate. So we created a sdp2xml() function which parses the plaintext offer and generates a suitable XML stanza for each offer it receives. It is a confusing part because different machines generates different offer depending on the media type present, so creating an equivalent stanza is tricky.
+3.  In the meantime I got confused between using a [Draft XEP: Jingle SDP Content](http://xmpp.org/extensions/inbox/jingle-sdp.html) and XEP: 0320 and badly messed things up. We finally made a good decision on going with the standard 0320.
+4.  The next part was to test the function developed. An xpcshell-test has been written for the sdp2xml().
+
+The next task is to create a real SDP call offer whenever caller makes a call request —> covert it to IQ Stanza. For this we have decided to add a call button (generalized way of adding it is already developed) , create an interface between the UI and the XMPP backend which passes the offer as an argument to the sdp2xml() and then send the stanza. :)
