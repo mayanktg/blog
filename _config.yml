@@ -75,3 +75,6 @@ admin:
   username: mayanktg
   password_hash: $2a$08$oRo0kr9Pb9.w7wK/JGdb7e7Idbgj3.o6czUbaMwzlq52ZzVG4I6vC
   secret: valley of flowers
+                                                                
+# Flickr API key
+flickr_api_key: 268d318062c9dbc1715203b313018c20
